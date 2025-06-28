@@ -22,7 +22,7 @@ class AssetRegistration(BaseModel):
     
     asset_id: str = Field(description="Unique asset identifier")
     name: str = Field(description="Human-readable asset name")
-    model_id: int = Field(description="Asset model ID from catalog")
+    asset_model_id: int = Field(description="Asset model ID from catalog")
     location: Optional[Dict[str, Any]] = Field(default=None, description="Asset location data")
     metadata: Optional[Dict[str, Any]] = Field(default=None, description="Additional asset metadata")
 
@@ -96,7 +96,7 @@ class AssetRegistry:
         registration_data = AssetRegistration(
             asset_id=self.config.asset_id,
             name=self.config.asset_name,
-            model_id=self.config.asset_model_id,
+            asset_model_id=self.config.asset_model_id,
             metadata={
                 "edge_agent_version": "0.1.0",
                 "device_type": "raspberry_pi_zero_2w",
