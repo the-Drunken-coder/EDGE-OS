@@ -23,7 +23,7 @@ The ATLAS Edge Agent provides:
 
 Clone and install for development:
 ```bash
-git clone <your-repo-url> edge-agent
+git clone https://github.com/the-Drunken-coder/EDGE-OS.git edge-agent
 cd edge-agent
 python3 -m venv venv
 source venv/bin/activate
@@ -34,7 +34,7 @@ pip install -e .
 
 **Option A: One-liner setup** (after SSH-ing into a fresh Pi OS install):
 ```bash
-sudo apt update && sudo apt install -y git python3-venv && git clone <your-repo-url> /opt/edge-agent && cd /opt/edge-agent && python3 -m venv venv && source venv/bin/activate && pip install -U pip wheel && pip install .
+sudo apt update && sudo apt install -y git python3-venv && git clone https://github.com/the-Drunken-coder/EDGE-OS.git /opt/edge-agent && cd /opt/edge-agent && python3 -m venv venv && source venv/bin/activate && pip install -U pip wheel && pip install .
 ```
 
 **Option B: Manual setup**:
@@ -43,7 +43,7 @@ sudo apt update && sudo apt install -y git python3-venv && git clone <your-repo-
 sudo apt update && sudo apt install -y git python3-venv
 
 # Clone repository
-sudo git clone <your-repo-url> /opt/edge-agent
+sudo git clone https://github.com/the-Drunken-coder/EDGE-OS.git /opt/edge-agent
 cd /opt/edge-agent
 
 # Create virtual environment
@@ -129,7 +129,7 @@ The agent uses environment variables for configuration:
 ### Setup Development Environment
 
 ```bash
-git clone <your-repo-url> edge-agent
+git clone https://github.com/the-Drunken-coder/EDGE-OS.git edge-agent
 cd edge-agent
 python3 -m venv venv
 source venv/bin/activate

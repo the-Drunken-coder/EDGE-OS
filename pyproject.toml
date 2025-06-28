@@ -39,9 +39,9 @@ dev = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/your-org/edge-agent"
-"Bug Reports" = "https://github.com/your-org/edge-agent/issues"
-"Source" = "https://github.com/your-org/edge-agent"
+"Homepage" = "https://github.com/the-Drunken-coder/EDGE-OS"
+"Bug Reports" = "https://github.com/the-Drunken-coder/EDGE-OS/issues"
+"Source" = "https://github.com/the-Drunken-coder/EDGE-OS"
 
 [project.scripts]
 atlas-edge = "atlas_edge.edge_stub:main"
