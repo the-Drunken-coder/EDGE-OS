@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 class AssetRegistration(BaseModel):
     """Asset registration payload for POST /api/v1/assets."""
     
-    asset_id: str = Field(description="Unique asset identifier")
+    id: str = Field(description="Unique asset identifier")
     name: str = Field(description="Human-readable asset name")
     asset_model_id: int = Field(description="Asset model ID from catalog")
     location: Optional[Dict[str, Any]] = Field(default=None, description="Asset location data")
@@ -94,7 +94,7 @@ class AssetRegistry:
             True if registration successful, False otherwise
         """
         registration_data = AssetRegistration(
-            asset_id=self.config.asset_id,
+            id=self.config.asset_id,
             name=self.config.asset_name,
             asset_model_id=self.config.asset_model_id,
             metadata={

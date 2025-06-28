@@ -17,7 +17,7 @@ class EdgeConfig(BaseModel):
     
     # ATLAS backend configuration
     atlas_url: str = Field(
-        default_factory=lambda: os.getenv("ATLAS_URL", "http://atlas-host.local:8000/api/v1"),
+        default_factory=lambda: os.getenv("ATLAS_URL", "http://atlas-host.local:8000/api/v1/"),
         description="Base URL for ATLAS Command API"
     )
     

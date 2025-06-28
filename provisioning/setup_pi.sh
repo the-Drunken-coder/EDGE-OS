@@ -1,80 +1,76 @@
 #!/bin/bash
-# ATLAS Edge Agent - Raspberry Pi Setup Script
-# 
-# This script installs and configures the ATLAS Edge Agent on a Raspberry Pi.
-# Run this on a fresh Raspberry Pi OS Lite install after SSH-ing in.
-#
-# Usage:
-#   curl -sSL https://raw.githubusercontent.com/the-Drunken-coder/EDGE-OS/main/provisioning/setup_pi.sh | bash
-#   Or: wget -qO- https://raw.githubusercontent.com/the-Drunken-coder/EDGE-OS/main/provisioning/setup_pi.sh | bash
-#   Or: Copy and paste the one-liner below
+# ATLAS Edge Agent Setup Script for Raspberry Pi
+# Run with: curl -sSL https://raw.githubusercontent.com/the-Drunken-coder/EDGE-OS/main/provisioning/setup_pi.sh | bash
 
-set -euo pipefail
+set -e
 
-REPO_URL="${REPO_URL:-https://github.com/the-Drunken-coder/EDGE-OS.git}"
-INSTALL_DIR="${INSTALL_DIR:-/opt/edge-agent}"
-ASSET_ID="${ASSET_ID:-EDGE-$(hostname)}"
+echo "=== ATLAS Edge Agent Setup ==="
+echo "Setting up edge agent on $(hostname)"
 
-# Detect current user and group dynamically
-CURRENT_USER=$(whoami)
-CURRENT_GROUP=$(id -gn)
+# Configuration
+REPO_URL="https://github.com/the-Drunken-coder/EDGE-OS"
+INSTALL_DIR="/opt/edge-agent"
+ATLAS_URL="${ATLAS_URL:-http://192.168.1.132:8000/api/v1/}"
+ASSET_ID="${ASSET_ID:-EDGE-PI-$(hostname | tr '[:lower:]' '[:upper:]')}"
+ASSET_NAME="${ASSET_NAME:-Raspberry Pi Edge Agent}"
 
-log() {
-    echo "[setup] $*"
-}
+echo "Configuration:"
+echo "  Repository: $REPO_URL"
+echo "  Install Directory: $INSTALL_DIR"
+echo "  ATLAS URL: $ATLAS_URL"
+echo "  Asset ID: $ASSET_ID"
+echo "  Asset Name: $ASSET_NAME"
 
-log "Starting ATLAS Edge Agent setup on $(hostname)"
+# Update system
+echo "Updating system packages..."
+sudo apt update && sudo apt upgrade -y
 
-# Update system and install dependencies
-log "Installing system dependencies"
-sudo apt update && sudo apt install -y git python3-venv
+# Install dependencies
+echo "Installing dependencies..."
+sudo apt install -y python3 python3-pip python3-venv git curl
+
+# Create installation directory
+echo "Creating installation directory..."
+sudo mkdir -p $INSTALL_DIR
+sudo chown $(whoami):$(id -gn) $INSTALL_DIR
 
 # Clone repository
-log "Cloning repository to $INSTALL_DIR"
-sudo rm -rf "$INSTALL_DIR"
-sudo git clone "$REPO_URL" "$INSTALL_DIR"
-log "Setting ownership to $CURRENT_USER:$CURRENT_GROUP"
-sudo chown -R "$CURRENT_USER:$CURRENT_GROUP" "$INSTALL_DIR"
-cd "$INSTALL_DIR"
+echo "Cloning repository..."
+cd $INSTALL_DIR
+git clone $REPO_URL.git .
 
-# Create virtual environment
-log "Setting up Python virtual environment"
+# Create and activate virtual environment
+echo "Setting up Python virtual environment..."
 python3 -m venv venv
 source venv/bin/activate
 
-# Install package
-log "Installing ATLAS Edge Agent package"
-pip install -U pip wheel
-pip install .
-
-# Create configuration
-log "Creating configuration file"
-sudo tee /etc/atlas-edge.env << EOF
-ATLAS_URL=http://atlas-host.local:8000/api/v1
-ASSET_ID=$ASSET_ID
-ASSET_NAME=Edge Agent Device ($ASSET_ID)
-TELEMETRY_INTERVAL=5.0
-COMMAND_POLL_INTERVAL=2.0
-EOF
-
-sudo chmod 600 /etc/atlas-edge.env
+# Install Python dependencies
+echo "Installing Python dependencies..."
+pip install --upgrade pip
+pip install -e .
 
 # Create systemd service
-log "Creating systemd service"
-sudo tee /etc/systemd/system/atlas-edge.service << EOF
+echo "Creating systemd service..."
+sudo tee /etc/systemd/system/edge-agent.service > /dev/null << EOF
 [Unit]
 Description=ATLAS Edge Agent
-After=network-online.target
+After=network.target
 Wants=network-online.target
 
 [Service]
-Type=exec
-User=$CURRENT_USER
-Group=$CURRENT_GROUP
-ExecStart=$INSTALL_DIR/venv/bin/python -m atlas_edge.edge_stub
-EnvironmentFile=/etc/atlas-edge.env
-Restart=on-failure
-RestartSec=5
+Type=simple
+User=$(whoami)
+Group=$(id -gn)
+WorkingDirectory=$INSTALL_DIR
+Environment="ATLAS_URL=$ATLAS_URL"
+Environment="ASSET_ID=$ASSET_ID"
+Environment="ASSET_NAME=$ASSET_NAME"
+Environment="ASSET_MODEL_ID=1"
+Environment="TELEMETRY_INTERVAL=5.0"
+Environment="COMMAND_POLL_INTERVAL=2.0"
+ExecStart=$INSTALL_DIR/venv/bin/python3 -m atlas_edge.edge_stub
+Restart=always
+RestartSec=10
 StandardOutput=journal
 StandardError=journal
 
@@ -83,15 +79,23 @@ WantedBy=multi-user.target
 EOF
 
 # Enable and start service
-log "Enabling and starting service"
+echo "Enabling and starting edge agent service..."
 sudo systemctl daemon-reload
-sudo systemctl enable atlas-edge.service
-sudo systemctl start atlas-edge.service
+sudo systemctl enable edge-agent
+sudo systemctl start edge-agent
 
 # Show status
-log "Setup complete! Service status:"
-sudo systemctl status atlas-edge.service --no-pager
+echo "=== Setup Complete ==="
+echo "Service status:"
+sudo systemctl status edge-agent --no-pager
 
-log "To monitor logs: sudo journalctl -u atlas-edge -f"
-log "To restart: sudo systemctl restart atlas-edge"
-log "Configuration: /etc/atlas-edge.env" 
+echo ""
+echo "To view logs: sudo journalctl -u edge-agent -f"
+echo "To restart: sudo systemctl restart edge-agent"
+echo "To stop: sudo systemctl stop edge-agent"
+
+echo ""
+echo "Edge agent is now running with:"
+echo "  Asset ID: $ASSET_ID"
+echo "  ATLAS URL: $ATLAS_URL"
+echo "  Install Directory: $INSTALL_DIR" 
