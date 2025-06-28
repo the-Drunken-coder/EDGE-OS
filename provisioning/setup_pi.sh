@@ -29,6 +29,7 @@ sudo apt update && sudo apt install -y git python3-venv
 log "Cloning repository to $INSTALL_DIR"
 sudo rm -rf "$INSTALL_DIR"
 sudo git clone "$REPO_URL" "$INSTALL_DIR"
+sudo chown -R pi:pi "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 
 # Create virtual environment
