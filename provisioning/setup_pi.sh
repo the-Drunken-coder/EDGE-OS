@@ -15,6 +15,10 @@ REPO_URL="${REPO_URL:-https://github.com/the-Drunken-coder/EDGE-OS.git}"
 INSTALL_DIR="${INSTALL_DIR:-/opt/edge-agent}"
 ASSET_ID="${ASSET_ID:-EDGE-$(hostname)}"
 
+# Detect current user and group dynamically
+CURRENT_USER=$(whoami)
+CURRENT_GROUP=$(id -gn)
+
 log() {
     echo "[setup] $*"
 }
@@ -29,7 +33,8 @@ sudo apt update && sudo apt install -y git python3-venv
 log "Cloning repository to $INSTALL_DIR"
 sudo rm -rf "$INSTALL_DIR"
 sudo git clone "$REPO_URL" "$INSTALL_DIR"
-sudo chown -R $USER:$USER "$INSTALL_DIR"
+log "Setting ownership to $CURRENT_USER:$CURRENT_GROUP"
+sudo chown -R "$CURRENT_USER:$CURRENT_GROUP" "$INSTALL_DIR"
 cd "$INSTALL_DIR"
 
 # Create virtual environment
@@ -64,8 +69,8 @@ Wants=network-online.target
 
 [Service]
 Type=exec
-User=$USER
-Group=$USER
+User=$CURRENT_USER
+Group=$CURRENT_GROUP
 ExecStart=$INSTALL_DIR/venv/bin/python -m atlas_edge.edge_stub
 EnvironmentFile=/etc/atlas-edge.env
 Restart=on-failure
