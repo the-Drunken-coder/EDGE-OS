@@ -24,10 +24,12 @@ class TelemetryReading(BaseModel):
     
     def model_dump(self, **kwargs) -> dict[str, Any]:
         """Custom serialization to handle datetime formatting."""
-        data = super().model_dump(**kwargs)
-        if self.timestamp:
-            data["timestamp"] = self.timestamp.isoformat()
-        return data
+        return {
+            "metric_key": self.metric_key,
+            "value": self.value,
+            "unit": self.unit,
+            "timestamp": self.timestamp.isoformat() if self.timestamp else None
+        }
 
 
 class TelemetryPayload(BaseModel):
@@ -41,9 +43,10 @@ class TelemetryPayload(BaseModel):
     
     def model_dump(self, **kwargs) -> dict[str, Any]:
         """Custom serialization to handle datetime formatting."""
-        data = super().model_dump(**kwargs)
-        data["batch_timestamp"] = self.batch_timestamp.isoformat()
-        return data
+        return {
+            "readings": [reading.model_dump(**kwargs) for reading in self.readings],
+            "batch_timestamp": self.batch_timestamp.isoformat()
+        }
 
 
 class BatchTelemetryPayload(BaseModel):

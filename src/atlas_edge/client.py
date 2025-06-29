@@ -62,7 +62,8 @@ class AtlasClient:
         self._client = httpx.AsyncClient(
             base_url=self.base_url,
             timeout=httpx.Timeout(self.config.request_timeout),
-            headers=self.headers
+            headers=self.headers,
+            follow_redirects=True
         )
         return self
     
