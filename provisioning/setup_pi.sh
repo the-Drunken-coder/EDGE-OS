@@ -1,10 +1,12 @@
 #!/bin/bash
 # ATLAS Edge Agent Setup Script for Raspberry Pi
 # 
-# Interactive usage:
+# Interactive usage (default):
 #   curl -sSL https://raw.githubusercontent.com/the-Drunken-coder/EDGE-OS/main/provisioning/setup_pi.sh | bash
+#   wget https://raw.githubusercontent.com/the-Drunken-coder/EDGE-OS/main/provisioning/setup_pi.sh && chmod +x setup_pi.sh && ./setup_pi.sh
 #
-# Automated usage with environment variables:
+# Non-interactive usage with environment variables:
+#   export NON_INTERACTIVE=true
 #   export ATLAS_URL="http://your-server:8000/api/v1/"
 #   export ASSET_ID="DRONE-001"
 #   export ASSET_NAME="Field Drone Alpha"
@@ -25,17 +27,19 @@ DEFAULT_ATLAS_URL="http://192.168.1.132:8000/api/v1/"
 DEFAULT_ASSET_ID="EDGE-PI-$(hostname | tr '[:lower:]' '[:upper:]')"
 DEFAULT_ASSET_NAME="Edge Agent on $(hostname)"
 
-# Check if we have a TTY and can prompt for input
-if [ -t 0 ] && [ -t 1 ]; then
+# Check for non-interactive mode via environment variable, otherwise default to interactive
+if [ "${NON_INTERACTIVE:-false}" = "true" ]; then
+    INTERACTIVE=false
+    echo "Running in non-interactive mode. Using environment variables or defaults."
+    echo ""
+else
     INTERACTIVE=true
     echo "🤖 Welcome to ATLAS Edge Agent setup!"
     echo ""
     echo "This script will configure and install the edge agent on your Raspberry Pi."
     echo "You'll be prompted for configuration details."
     echo ""
-else
-    INTERACTIVE=false
-    echo "Running in non-interactive mode. Using environment variables or defaults."
+    echo "💡 Tip: For automated installs, set NON_INTERACTIVE=true"
     echo ""
 fi
 
@@ -51,7 +55,12 @@ prompt_or_env() {
         if [ -n "$default_value" ]; then
             echo "Default: $default_value"
         fi
-        read -p "> " result
+        # Handle case where stdin is not a TTY (like curl | bash)
+        if [ ! -t 0 ]; then
+            read -p "> " result </dev/tty
+        else
+            read -p "> " result
+        fi
         if [ -z "$result" ]; then
             result="$default_value"
         fi
@@ -94,7 +103,11 @@ if [ "$INTERACTIVE" = true ]; then
     echo "2) Drone (ID: 2)"  
     echo "3) Sensor Station (ID: 3)"
     echo "4) Custom (enter ID manually)"
-    read -p "Select option [1-4]: " MODEL_CHOICE
+    if [ ! -t 0 ]; then
+        read -p "Select option [1-4]: " MODEL_CHOICE </dev/tty
+    else
+        read -p "Select option [1-4]: " MODEL_CHOICE
+    fi
     
     case $MODEL_CHOICE in
         1)
@@ -111,7 +124,11 @@ if [ "$INTERACTIVE" = true ]; then
             ;;
         4)
             echo "Enter custom asset model ID:"
-            read -p "> " ASSET_MODEL_ID
+            if [ ! -t 0 ]; then
+                read -p "> " ASSET_MODEL_ID </dev/tty
+            else
+                read -p "> " ASSET_MODEL_ID
+            fi
             MODEL_NAME="Custom Model"
             ;;
         *)
@@ -154,7 +171,11 @@ echo ""
 
 # Confirmation prompt (only in interactive mode)
 if [ "$INTERACTIVE" = true ]; then
-    read -p "Continue with this configuration? [Y/n]: " CONFIRM
+    if [ ! -t 0 ]; then
+        read -p "Continue with this configuration? [Y/n]: " CONFIRM </dev/tty
+    else
+        read -p "Continue with this configuration? [Y/n]: " CONFIRM
+    fi
     case $CONFIRM in
         [nN][oO]|[nN])
             echo "Setup cancelled."
