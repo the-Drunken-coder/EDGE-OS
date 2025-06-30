@@ -91,10 +91,14 @@ if [ "$INTERACTIVE" = true ]; then
     echo ""
     echo "🏷️  Asset Identification"
 fi
-ASSET_ID=$(prompt_or_env "Enter a unique identifier for this edge device:" "ASSET_ID" "$DEFAULT_ASSET_ID")
+ASSET_ID=$(prompt_or_env "Enter a unique identifier for this edge device (e.g., DRONE-001, PI-LAB-01):" "ASSET_ID" "$DEFAULT_ASSET_ID")
 
 # Get Asset Name
-ASSET_NAME=$(prompt_or_env "Enter a human-readable name for this device:" "ASSET_NAME" "$DEFAULT_ASSET_NAME")
+if [ "$INTERACTIVE" = true ]; then
+    echo ""
+    echo "📝 Asset Display Name"
+fi
+ASSET_NAME=$(prompt_or_env "Enter a human-readable name for this device (e.g., 'Lab Test Drone', 'Field Sensor Alpha'):" "ASSET_NAME" "$DEFAULT_ASSET_NAME")
 
 # Get Asset Model
 if [ "$INTERACTIVE" = true ]; then
@@ -155,8 +159,8 @@ if [ "$INTERACTIVE" = true ]; then
     echo ""
     echo "⏱️  Timing Configuration"
 fi
-TELEMETRY_INTERVAL=$(prompt_or_env "Enter telemetry interval in seconds (how often to send sensor data):" "TELEMETRY_INTERVAL" "5.0")
-COMMAND_POLL_INTERVAL=$(prompt_or_env "Enter command poll interval in seconds (how often to check for commands):" "COMMAND_POLL_INTERVAL" "2.0")
+TELEMETRY_INTERVAL=$(prompt_or_env "Enter telemetry interval in seconds (how often to send sensor data, e.g., 5.0):" "TELEMETRY_INTERVAL" "5.0")
+COMMAND_POLL_INTERVAL=$(prompt_or_env "Enter command poll interval in seconds (how often to check for commands, e.g., 2.0):" "COMMAND_POLL_INTERVAL" "2.0")
 
 echo ""
 echo "📝 Configuration Summary"
