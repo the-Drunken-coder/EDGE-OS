@@ -72,11 +72,13 @@ prompt_or_env() {
     echo "$result"
 }
 
-# Get ATLAS URL
+# Set static ATLAS URL
+ATLAS_URL="$DEFAULT_ATLAS_URL"
 if [ "$INTERACTIVE" = true ]; then
     echo "📡 ATLAS Command API Configuration"
+    echo "Using: $ATLAS_URL"
+    echo ""
 fi
-ATLAS_URL=$(prompt_or_env "Enter the ATLAS Command API URL (include /api/v1/ at the end):" "ATLAS_URL" "$DEFAULT_ATLAS_URL")
 
 # Validate URL format
 if [[ ! $ATLAS_URL =~ ^https?:// ]]; then
