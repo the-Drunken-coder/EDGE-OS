@@ -158,9 +158,22 @@ fi
 if [ "$INTERACTIVE" = true ]; then
     echo ""
     echo "⏱️  Timing Configuration"
+    echo ""
+    echo "📡 Telemetry Interval"
+    echo "How often should this device send sensor data to the ATLAS server?"
+    echo "Lower values = more frequent updates, higher network usage"
+    echo "Recommended: 5.0 seconds for most applications"
 fi
-TELEMETRY_INTERVAL=$(prompt_or_env "Enter telemetry interval in seconds (how often to send sensor data, e.g., 5.0):" "TELEMETRY_INTERVAL" "5.0")
-COMMAND_POLL_INTERVAL=$(prompt_or_env "Enter command poll interval in seconds (how often to check for commands, e.g., 2.0):" "COMMAND_POLL_INTERVAL" "2.0")
+TELEMETRY_INTERVAL=$(prompt_or_env "Enter telemetry interval in seconds:" "TELEMETRY_INTERVAL" "5.0")
+
+if [ "$INTERACTIVE" = true ]; then
+    echo ""
+    echo "📨 Command Poll Interval" 
+    echo "How often should this device check for new commands from ATLAS?"
+    echo "Lower values = faster command response, more network requests"
+    echo "Recommended: 2.0 seconds for real-time control"
+fi
+COMMAND_POLL_INTERVAL=$(prompt_or_env "Enter command poll interval in seconds:" "COMMAND_POLL_INTERVAL" "2.0")
 
 echo ""
 echo "📝 Configuration Summary"
