@@ -93,19 +93,27 @@ class AssetRegistry:
         Returns:
             True if registration successful, False otherwise
         """
+        # Prepare location data for stationary assets
+        location_data = None
+        if (self.config.asset_type == "stationary" and 
+            self.config.has_static_location()):
+            location_data = self.config.get_location_dict()
+        
         registration_data = AssetRegistration(
             id=self.config.asset_id,
             name=self.config.asset_name,
             asset_model_id=self.config.asset_model_id,
+            location=location_data,
             metadata={
                 "edge_agent_version": "0.1.0",
                 "device_type": "raspberry_pi_zero_2w",
+                "asset_type": self.config.asset_type,
                 "registration_time": datetime.now(timezone.utc).isoformat()
             }
         )
         
         try:
-            logger.info(f"Registering asset {self.config.asset_id}")
+            logger.info(f"Registering asset {self.config.asset_id} (type: {self.config.asset_type})")
             
             response = await self.client.post(
                 "/assets",

@@ -13,6 +13,8 @@ from typing import Any, Dict, List, Optional, Union
 
 from pydantic import BaseModel, Field
 
+from .config import EdgeConfig
+
 
 class TelemetryReading(BaseModel):
     """Individual telemetry reading."""
@@ -65,16 +67,19 @@ class MockTelemetryGenerator:
     """Generator for realistic mock telemetry data.
     
     Simulates various sensor readings with realistic drift, noise, and patterns.
-    Useful for Stage-2 testing when real sensors are not available.
+    Supports both mobile assets (with GPS simulation) and stationary assets 
+    (with fixed coordinates).
     """
     
-    def __init__(self, asset_id: str):
+    def __init__(self, asset_id: str, config: Optional[EdgeConfig] = None):
         """Initialize telemetry generator.
         
         Args:
             asset_id: Asset identifier for telemetry context
+            config: Edge configuration for asset type and location settings
         """
         self.asset_id = asset_id
+        self.config = config
         self._last_values = {
             "battery_voltage": 12.8,
             "solar_voltage": 18.2,
@@ -90,6 +95,13 @@ class MockTelemetryGenerator:
             "accelerometer_y": 0.0,
             "accelerometer_z": 9.81,
         }
+        
+        # Initialize GPS coordinates from config if available for stationary assets
+        if (config and config.asset_type == "stationary" and 
+            config.has_static_location()):
+            self._last_values["gps_latitude"] = config.static_latitude
+            self._last_values["gps_longitude"] = config.static_longitude
+        
         self._random_seed = hash(asset_id) % 10000
         random.seed(self._random_seed)
     
@@ -224,13 +236,25 @@ class MockTelemetryGenerator:
             )
         
         elif metric_key in ["gps_latitude", "gps_longitude"]:
-            # GPS coordinates: very small random walk (stationary device)
-            self._last_values[metric_key] = self._random_walk(
-                self._last_values[metric_key], 
-                self._last_values[metric_key] - 0.001,
-                self._last_values[metric_key] + 0.001,
-                0.0001
-            )
+            # GPS coordinates: behavior depends on asset type
+            if self.config and self.config.asset_type == "stationary":
+                # Stationary assets: return fixed coordinates with minimal drift
+                # to simulate GPS precision variations
+                self._last_values[metric_key] = self._random_walk(
+                    self._last_values[metric_key], 
+                    self._last_values[metric_key] - 0.00001,  # ~1m precision
+                    self._last_values[metric_key] + 0.00001,
+                    0.000005
+                )
+            else:
+                # Mobile assets: larger random walk for movement simulation
+                self._last_values[metric_key] = self._random_walk(
+                    self._last_values[metric_key], 
+                    self._last_values[metric_key] - 0.001,
+                    self._last_values[metric_key] + 0.001,
+                    0.0001
+                )
+            
             return TelemetryReading(
                 metric_key=metric_key,
                 value=round(self._last_values[metric_key], 6),
@@ -267,6 +291,33 @@ class MockTelemetryGenerator:
                 timestamp=timestamp
             )
     
+    def get_default_metrics(self) -> List[str]:
+        """Get default metrics list based on asset type.
+        
+        Returns:
+            List of default metrics for this asset type
+        """
+        base_metrics = [
+            "battery_voltage",
+            "solar_voltage", 
+            "internal_temp",
+            "cpu_temp",
+            "memory_usage",
+            "cpu_usage",
+            "signal_strength",
+        ]
+        
+        # Add GPS metrics based on asset type
+        if (self.config and self.config.asset_type == "stationary" and 
+            self.config.has_static_location()):
+            # Stationary assets with configured location: include GPS
+            base_metrics.extend(["gps_latitude", "gps_longitude"])
+        elif not self.config or self.config.asset_type == "mobile":
+            # Mobile assets: always include GPS
+            base_metrics.extend(["gps_latitude", "gps_longitude"])
+        
+        return base_metrics
+    
     def generate_telemetry_batch(
         self,
         metrics: Optional[List[str]] = None,
@@ -282,17 +333,7 @@ class MockTelemetryGenerator:
             Complete telemetry payload
         """
         if metrics is None:
-            metrics = [
-                "battery_voltage",
-                "solar_voltage", 
-                "internal_temp",
-                "cpu_temp",
-                "memory_usage",
-                "cpu_usage",
-                "signal_strength",
-                "gps_latitude",
-                "gps_longitude",
-            ]
+            metrics = self.get_default_metrics()
         
         if timestamp is None:
             timestamp = datetime.now(timezone.utc)

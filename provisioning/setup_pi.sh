@@ -11,6 +11,11 @@
 #   export ASSET_ID="DRONE-001"
 #   export ASSET_NAME="Field Drone Alpha"
 #   export ASSET_MODEL_ID="2"
+#   export ASSET_TYPE="stationary"                    # or "mobile"
+#   export STATIC_LATITUDE="40.7128"                  # for stationary assets only
+#   export STATIC_LONGITUDE="-74.0060"                # for stationary assets only
+#   export STATIC_ALTITUDE="10"                       # optional, for stationary assets
+#   export LOCATION_DESCRIPTION="Roof of Building A"  # optional, for stationary assets
 #   curl -sSL https://raw.githubusercontent.com/the-Drunken-coder/EDGE-OS/main/provisioning/setup_pi.sh | bash
 
 set -e
@@ -51,9 +56,9 @@ prompt_or_env() {
     local result=""
     
     if [ "$INTERACTIVE" = true ]; then
-        echo "$prompt_text"
+        echo "$prompt_text" >&2
         if [ -n "$default_value" ]; then
-            echo "Default: $default_value"
+            echo "Default: $default_value" >&2
         fi
         # Handle case where stdin is not a TTY (like curl | bash)
         if [ ! -t 0 ]; then
@@ -154,6 +159,76 @@ else
     esac
 fi
 
+# Get Asset Type and Location
+if [ "$INTERACTIVE" = true ]; then
+    echo ""
+    echo "📍 Asset Type Configuration"
+    echo "Select the deployment type for this asset:"
+    echo "1) Mobile - Requires GPS module, tracks real-time location"
+    echo "2) Stationary - Fixed location, no GPS needed"
+    if [ ! -t 0 ]; then
+        read -p "Asset Type [1/2]: " ASSET_TYPE_CHOICE </dev/tty
+    else
+        read -p "Asset Type [1/2]: " ASSET_TYPE_CHOICE
+    fi
+    
+    case $ASSET_TYPE_CHOICE in
+        1)
+            ASSET_TYPE="mobile"
+            TYPE_NAME="Mobile"
+            ;;
+        2)
+            ASSET_TYPE="stationary"
+            TYPE_NAME="Stationary"
+            ;;
+        *)
+            echo "Invalid selection. Using default (Mobile)."
+            ASSET_TYPE="mobile"
+            TYPE_NAME="Mobile"
+            ;;
+    esac
+else
+    # Non-interactive: use environment variable or default
+    ASSET_TYPE="${ASSET_TYPE:-mobile}"
+    case $ASSET_TYPE in
+        mobile) TYPE_NAME="Mobile" ;;
+        stationary) TYPE_NAME="Stationary" ;;
+        *) TYPE_NAME="Mobile" ;;
+    esac
+fi
+
+# Get location for stationary assets
+if [ "$ASSET_TYPE" = "stationary" ]; then
+    if [ "$INTERACTIVE" = true ]; then
+        echo ""
+        echo "🗺️  Fixed Location Configuration"
+        echo "Enter the coordinates for this stationary asset:"
+    fi
+    
+    STATIC_LATITUDE=$(prompt_or_env "Latitude (decimal degrees, e.g., 40.7128):" "STATIC_LATITUDE" "")
+    STATIC_LONGITUDE=$(prompt_or_env "Longitude (decimal degrees, e.g., -74.0060):" "STATIC_LONGITUDE" "")
+    STATIC_ALTITUDE=$(prompt_or_env "Altitude (meters, optional):" "STATIC_ALTITUDE" "")
+    LOCATION_DESCRIPTION=$(prompt_or_env "Location Description (optional, e.g., 'Roof of Building A'):" "LOCATION_DESCRIPTION" "")
+    
+    # Validate coordinates
+    if [ -z "$STATIC_LATITUDE" ] || [ -z "$STATIC_LONGITUDE" ]; then
+        echo "❌ Error: Latitude and longitude are required for stationary assets."
+        exit 1
+    fi
+    
+    # Validate latitude range (-90 to 90)
+    if ! echo "$STATIC_LATITUDE" | grep -E '^-?([0-8]?[0-9](\.[0-9]+)?|90(\.0+)?)$' > /dev/null; then
+        echo "❌ Error: Invalid latitude. Must be between -90 and 90 degrees."
+        exit 1
+    fi
+    
+    # Validate longitude range (-180 to 180)
+    if ! echo "$STATIC_LONGITUDE" | grep -E '^-?((1[0-7][0-9]|[0-9]?[0-9])(\.[0-9]+)?|180(\.0+)?)$' > /dev/null; then
+        echo "❌ Error: Invalid longitude. Must be between -180 and 180 degrees."
+        exit 1
+    fi
+fi
+
 # Get timing configuration
 if [ "$INTERACTIVE" = true ]; then
     echo ""
@@ -171,9 +246,9 @@ if [ "$INTERACTIVE" = true ]; then
     echo "📨 Command Poll Interval" 
     echo "How often should this device check for new commands from ATLAS?"
     echo "Lower values = faster command response, more network requests"
-    echo "Recommended: 2.0 seconds for real-time control"
+    echo "Recommended: 5.0 seconds for balanced responsiveness"
 fi
-COMMAND_POLL_INTERVAL=$(prompt_or_env "Enter command poll interval in seconds:" "COMMAND_POLL_INTERVAL" "2.0")
+COMMAND_POLL_INTERVAL=$(prompt_or_env "Enter command poll interval in seconds:" "COMMAND_POLL_INTERVAL" "5.0")
 
 echo ""
 echo "📝 Configuration Summary"
@@ -182,6 +257,16 @@ echo "ATLAS URL:           $ATLAS_URL"
 echo "Asset ID:            $ASSET_ID"
 echo "Asset Name:          $ASSET_NAME"
 echo "Asset Model:         $MODEL_NAME (ID: $ASSET_MODEL_ID)"
+echo "Asset Type:          $TYPE_NAME"
+if [ "$ASSET_TYPE" = "stationary" ]; then
+    echo "Location:            $STATIC_LATITUDE, $STATIC_LONGITUDE"
+    if [ -n "$STATIC_ALTITUDE" ]; then
+        echo "Altitude:            ${STATIC_ALTITUDE}m"
+    fi
+    if [ -n "$LOCATION_DESCRIPTION" ]; then
+        echo "Description:         $LOCATION_DESCRIPTION"
+    fi
+fi
 echo "Telemetry Interval:  ${TELEMETRY_INTERVAL}s"
 echo "Command Interval:    ${COMMAND_POLL_INTERVAL}s"
 echo "Install Directory:   $INSTALL_DIR"
@@ -241,6 +326,33 @@ pip install -e .
 
 # Create systemd service
 echo "⚙️  Creating systemd service..."
+
+# Build environment variables dynamically
+ENV_VARS="Environment=\"ATLAS_URL=$ATLAS_URL\"
+Environment=\"ASSET_ID=$ASSET_ID\"
+Environment=\"ASSET_NAME=$ASSET_NAME\"
+Environment=\"ASSET_MODEL_ID=$ASSET_MODEL_ID\"
+Environment=\"ASSET_TYPE=$ASSET_TYPE\"
+Environment=\"TELEMETRY_INTERVAL=$TELEMETRY_INTERVAL\"
+Environment=\"COMMAND_POLL_INTERVAL=$COMMAND_POLL_INTERVAL\""
+
+# Add location environment variables for stationary assets
+if [ "$ASSET_TYPE" = "stationary" ] && [ -n "$STATIC_LATITUDE" ] && [ -n "$STATIC_LONGITUDE" ]; then
+    ENV_VARS="$ENV_VARS
+Environment=\"STATIC_LATITUDE=$STATIC_LATITUDE\"
+Environment=\"STATIC_LONGITUDE=$STATIC_LONGITUDE\""
+    
+    if [ -n "$STATIC_ALTITUDE" ]; then
+        ENV_VARS="$ENV_VARS
+Environment=\"STATIC_ALTITUDE=$STATIC_ALTITUDE\""
+    fi
+    
+    if [ -n "$LOCATION_DESCRIPTION" ]; then
+        ENV_VARS="$ENV_VARS
+Environment=\"LOCATION_DESCRIPTION=$LOCATION_DESCRIPTION\""
+    fi
+fi
+
 sudo tee /etc/systemd/system/edge-agent.service > /dev/null << EOF
 [Unit]
 Description=ATLAS Edge Agent ($ASSET_ID)
@@ -252,12 +364,7 @@ Type=simple
 User=$(whoami)
 Group=$(id -gn)
 WorkingDirectory=$INSTALL_DIR
-Environment="ATLAS_URL=$ATLAS_URL"
-Environment="ASSET_ID=$ASSET_ID"
-Environment="ASSET_NAME=$ASSET_NAME"
-Environment="ASSET_MODEL_ID=$ASSET_MODEL_ID"
-Environment="TELEMETRY_INTERVAL=$TELEMETRY_INTERVAL"
-Environment="COMMAND_POLL_INTERVAL=$COMMAND_POLL_INTERVAL"
+$ENV_VARS
 ExecStart=$INSTALL_DIR/venv/bin/python3 -m atlas_edge.edge_stub
 Restart=always
 RestartSec=10
@@ -270,17 +377,41 @@ EOF
 
 # Create configuration backup file
 echo "💾 Creating configuration backup..."
-sudo tee /etc/atlas-edge.conf > /dev/null << EOF
-# ATLAS Edge Agent Configuration
+
+# Build config file content
+CONFIG_CONTENT="# ATLAS Edge Agent Configuration
 # Generated on $(date)
 
 ATLAS_URL=$ATLAS_URL
 ASSET_ID=$ASSET_ID
 ASSET_NAME=$ASSET_NAME
 ASSET_MODEL_ID=$ASSET_MODEL_ID
+ASSET_TYPE=$ASSET_TYPE
 TELEMETRY_INTERVAL=$TELEMETRY_INTERVAL
 COMMAND_POLL_INTERVAL=$COMMAND_POLL_INTERVAL
-INSTALL_DIR=$INSTALL_DIR
+INSTALL_DIR=$INSTALL_DIR"
+
+# Add location variables for stationary assets
+if [ "$ASSET_TYPE" = "stationary" ] && [ -n "$STATIC_LATITUDE" ] && [ -n "$STATIC_LONGITUDE" ]; then
+    CONFIG_CONTENT="$CONFIG_CONTENT
+
+# Location Configuration (Stationary Asset)
+STATIC_LATITUDE=$STATIC_LATITUDE
+STATIC_LONGITUDE=$STATIC_LONGITUDE"
+
+    if [ -n "$STATIC_ALTITUDE" ]; then
+        CONFIG_CONTENT="$CONFIG_CONTENT
+STATIC_ALTITUDE=$STATIC_ALTITUDE"
+    fi
+    
+    if [ -n "$LOCATION_DESCRIPTION" ]; then
+        CONFIG_CONTENT="$CONFIG_CONTENT
+LOCATION_DESCRIPTION=$LOCATION_DESCRIPTION"
+    fi
+fi
+
+sudo tee /etc/atlas-edge.conf > /dev/null << EOF
+$CONFIG_CONTENT
 EOF
 
 # Enable and start service

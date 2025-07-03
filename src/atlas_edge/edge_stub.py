@@ -52,7 +52,7 @@ class EdgeAgent:
         self._shutdown_event = asyncio.Event()
         
         # Initialize components
-        self.telemetry_generator = MockTelemetryGenerator(config.asset_id)
+        self.telemetry_generator = MockTelemetryGenerator(config.asset_id, config)
         
         # These will be initialized in start()
         self.client: Optional[AtlasClient] = None

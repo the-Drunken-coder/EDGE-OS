@@ -37,6 +37,33 @@ class EdgeConfig(BaseModel):
         description="Asset model ID from ATLAS catalog"
     )
     
+    # Asset type and location configuration
+    asset_type: str = Field(
+        default_factory=lambda: os.getenv("ASSET_TYPE", "mobile"),
+        description="Asset deployment type: 'mobile' or 'stationary'"
+    )
+    
+    # Static location for stationary assets
+    static_latitude: Optional[float] = Field(
+        default_factory=lambda: float(os.getenv("STATIC_LATITUDE")) if os.getenv("STATIC_LATITUDE") else None,
+        description="Fixed latitude for stationary assets (decimal degrees)"
+    )
+    
+    static_longitude: Optional[float] = Field(
+        default_factory=lambda: float(os.getenv("STATIC_LONGITUDE")) if os.getenv("STATIC_LONGITUDE") else None,
+        description="Fixed longitude for stationary assets (decimal degrees)"
+    )
+    
+    static_altitude: Optional[float] = Field(
+        default_factory=lambda: float(os.getenv("STATIC_ALTITUDE")) if os.getenv("STATIC_ALTITUDE") else None,
+        description="Fixed altitude for stationary assets (meters)"
+    )
+    
+    location_description: Optional[str] = Field(
+        default_factory=lambda: os.getenv("LOCATION_DESCRIPTION"),
+        description="Human-readable location description"
+    )
+    
     # Telemetry and polling configuration
     telemetry_interval: float = Field(
         default_factory=lambda: float(os.getenv("TELEMETRY_INTERVAL", "5.0")),
@@ -70,6 +97,37 @@ class EdgeConfig(BaseModel):
         default_factory=lambda: os.getenv("BEARER_TOKEN"),
         description="Bearer token for API authentication"
     )
+    
+    def has_static_location(self) -> bool:
+        """Check if static location coordinates are configured.
+        
+        Returns:
+            True if latitude and longitude are both set
+        """
+        return (self.static_latitude is not None and 
+                self.static_longitude is not None)
+    
+    def get_location_dict(self) -> Optional[dict]:
+        """Get location as dictionary for API registration.
+        
+        Returns:
+            Location dictionary or None if no location configured
+        """
+        if not self.has_static_location():
+            return None
+        
+        location = {
+            "latitude": self.static_latitude,
+            "longitude": self.static_longitude
+        }
+        
+        if self.static_altitude is not None:
+            location["altitude"] = self.static_altitude
+            
+        if self.location_description:
+            location["description"] = self.location_description
+            
+        return location
 
 
 def load_config() -> EdgeConfig:
