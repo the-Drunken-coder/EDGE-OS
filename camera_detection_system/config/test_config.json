@@ -1,0 +1,23 @@
+{
+  "asset_id": "TEST_CAM_001",
+  "atlas_api_url": "http://localhost:8000/api/v1",
+  "telemetry_interval": 1.0,
+  "detection_confidence_threshold": 0.5,
+  "logging_level": "INFO",
+  "max_detections_per_frame": 10,
+  "frame_queue_size": 5,
+  "detection_queue_size": 10,
+  "telemetry_queue_size": 50,
+  "camera": {
+    "name": "Primary Security Camera",
+    "type": "usb_camera",
+    "width": 640,
+    "height": 480,
+    "horizontal_fov": 60.0,
+    "vertical_fov": 45.0,
+    "fps": 30,
+    "device_path": null,
+    "calibration_matrix": null,
+    "distortion_coefficients": null
+  }
+}

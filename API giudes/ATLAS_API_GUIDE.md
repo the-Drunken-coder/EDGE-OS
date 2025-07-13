@@ -77,6 +77,13 @@ TelemetryCreate example:
 }
 ```
 
+## 3.1 Global Telemetry (system-wide)
+Base prefix: `/telemetry`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/latest-all` | Latest telemetry from all assets (optional `limit`) |
+
 
 ## 4. Command Queue (per-asset)
 Base prefix: `/assets/{asset_id}/commands`
@@ -96,6 +103,13 @@ Command object (example – **GOTO**):
   "parameters": { "lat": 40.7130, "lon": -74.0050, "alt": 100 }
 }
 ```
+
+## 4.1 Global Commands (system-wide)
+Base prefix: `/commands`
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/all-queues` | Command queues from all assets (optional `limit`) |
 
 
 ## 5. Tasks (system-wide)
@@ -185,4 +199,4 @@ asyncio.run(main())
 
 ---
 
-*Last regenerated: 2025-06-26* 
+*Last regenerated: 2024-07-12* 
