@@ -10,6 +10,7 @@ import time
 import logging
 from typing import Optional, Tuple, Any
 from dataclasses import dataclass
+import numpy as np
 
 from models.config import CameraConfig
 
@@ -29,23 +30,25 @@ class CameraManager:
     Implements thread-safe frame capture with configurable frame rate control.
     """
     
-    def __init__(self, camera_config: CameraConfig, frame_queue: queue.Queue, max_queue_size: int = 10):
+    def __init__(self, camera_config: CameraConfig, frame_queue: queue.Queue, shutdown_event: threading.Event, use_mock: bool = False, max_queue_size: int = 10):
         """
         Initialize CameraManager with configuration and output queue.
         
         Args:
             camera_config: Camera configuration object
             frame_queue: Thread-safe queue for frame distribution
+            shutdown_event: Event to signal shutdown
+            use_mock: Use mock camera mode for testing
             max_queue_size: Maximum frames to keep in queue (prevents memory overflow)
         """
         self.config = camera_config
         self.frame_queue = frame_queue
         self.max_queue_size = max_queue_size
+        self.use_mock = use_mock
         
         # Camera state
         self.camera = None
         self.is_running = False
-        self.capture_thread = None
         
         # Frame tracking
         self.frame_counter = 0
@@ -53,12 +56,12 @@ class CameraManager:
         self.target_frame_interval = 1.0 / camera_config.fps if camera_config.fps > 0 else 0.033  # Default 30 FPS
         
         # Thread synchronization
-        self.stop_event = threading.Event()
+        self.stop_event = shutdown_event
         self.lock = threading.Lock()
         
         # Logging
         self.logger = logging.getLogger(__name__)
-        
+    
     def initialize_camera(self) -> bool:
         """
         Initialize camera based on configuration.
@@ -114,52 +117,16 @@ class CameraManager:
             self.logger.error(f"Camera initialization failed: {e}")
             return False
     
-    def start_capture(self) -> bool:
-        """
-        Start camera capture in a separate thread.
-        
-        Returns:
-            bool: True if capture started successfully, False otherwise
-        """
-        if self.is_running:
-            self.logger.warning("Camera capture already running")
-            return True
-            
-        if not self.camera:
+    def run(self):
+        """Main capture loop for the camera manager thread."""
+        if self.use_mock:
+            self.logger.info("Using mock camera mode")
+        else:
             if not self.initialize_camera():
-                return False
-                
-        # Reset synchronization objects
-        self.stop_event.clear()
+                self.logger.error("Failed to initialize camera, exiting run loop")
+                return
+        
         self.is_running = True
-        
-        # Start capture thread
-        self.capture_thread = threading.Thread(target=self._capture_loop, daemon=True)
-        self.capture_thread.start()
-        
-        self.logger.info("Camera capture started")
-        return True
-    
-    def stop_capture(self):
-        """Stop camera capture and cleanup resources."""
-        if not self.is_running:
-            return
-            
-        # Signal thread to stop
-        self.stop_event.set()
-        self.is_running = False
-        
-        # Wait for thread to finish
-        if self.capture_thread and self.capture_thread.is_alive():
-            self.capture_thread.join(timeout=5.0)
-            
-        # Cleanup camera
-        self._cleanup_camera()
-        
-        self.logger.info("Camera capture stopped")
-    
-    def _capture_loop(self):
-        """Main capture loop running in separate thread."""
         self.logger.info("Camera capture loop started")
         
         while not self.stop_event.is_set():
@@ -205,16 +172,29 @@ class CameraManager:
                 self.logger.error(f"Error in capture loop: {e}")
                 time.sleep(0.1)  # Brief pause before retrying
                 
+        self.is_running = False
+        self._cleanup_camera()
         self.logger.info("Camera capture loop ended")
     
     def _capture_frame(self) -> Optional[Any]:
         """
-        Capture a single frame from camera.
+        Capture a single frame from camera or generate mock frame.
         
         Returns:
-            numpy array: Captured frame, or None if capture failed
+            numpy array: Captured or mock frame, or None if capture failed
         """
         try:
+            if self.use_mock:
+                # Generate mock frame
+                frame = np.zeros((self.config.height, self.config.width, 3), dtype=np.uint8)
+                # Add some mock 'people' as rectangles
+                num_people = np.random.randint(1, 4)  # 1-3 mock people
+                for _ in range(num_people):
+                    x = np.random.randint(0, self.config.width - 100)
+                    y = np.random.randint(0, self.config.height - 200)
+                    cv2.rectangle(frame, (x, y), (x+80, y+160), (0, 255, 0), 2)
+                return frame
+            
             if self.config.type.lower() == 'usb_camera':
                 ret, frame = self.camera.read()
                 if not ret or frame is None:

@@ -19,6 +19,7 @@ except ImportError:
 
 from .camera_manager import FrameData
 from models.telemetry import Detection, BoundingBox
+from models.config import SystemConfig
 
 
 @dataclass
@@ -37,26 +38,27 @@ class PersonDetector:
     """
     
     def __init__(self, 
+                 config: SystemConfig,
                  frame_queue: queue.Queue, 
                  detection_queue: queue.Queue,
-                 model_path: str = "yolov8n.pt",
-                 confidence_threshold: float = 0.5,
-                 max_detections: int = 10):
+                 shutdown_event: threading.Event,
+                 model_path: str = "yolov8n.pt"):
         """
         Initialize PersonDetector with input/output queues and configuration.
         
         Args:
+            config: System configuration object
             frame_queue: Input queue for frames from CameraManager
             detection_queue: Output queue for detection results
+            shutdown_event: Event to signal shutdown
             model_path: Path to YOLO model file
-            confidence_threshold: Minimum confidence for detections (0.0-1.0)
-            max_detections: Maximum number of detections per frame
         """
+        self.config = config
         self.frame_queue = frame_queue
         self.detection_queue = detection_queue
         self.model_path = model_path
-        self.confidence_threshold = confidence_threshold
-        self.max_detections = max_detections
+        self.confidence_threshold = config.detection_confidence_threshold
+        self.max_detections = config.max_detections_per_frame
         
         # Detection state
         self.model = None
@@ -69,7 +71,7 @@ class PersonDetector:
         self.last_detection_time = 0
         
         # Thread synchronization
-        self.stop_event = threading.Event()
+        self.stop_event = shutdown_event
         self.lock = threading.Lock()
         
         # Logging
@@ -77,6 +79,9 @@ class PersonDetector:
         
         # YOLO class ID for person (COCO dataset)
         self.PERSON_CLASS_ID = 0
+        
+        # Initialize model in __init__
+        self.initialize_model()
         
     def initialize_model(self) -> bool:
         """
@@ -104,49 +109,13 @@ class PersonDetector:
             self.logger.error(f"Failed to load YOLO model: {e}")
             return False
     
-    def start_detection(self) -> bool:
-        """
-        Start person detection in a separate thread.
-        
-        Returns:
-            bool: True if detection started successfully, False otherwise
-        """
-        if self.is_running:
-            self.logger.warning("Person detection already running")
-            return True
-            
-        if not self.model:
-            if not self.initialize_model():
-                return False
-                
-        # Reset synchronization objects
-        self.stop_event.clear()
-        self.is_running = True
-        
-        # Start detection thread
-        self.detection_thread = threading.Thread(target=self._detection_loop, daemon=True)
-        self.detection_thread.start()
-        
-        self.logger.info("Person detection started")
-        return True
-    
-    def stop_detection(self):
-        """Stop person detection and cleanup resources."""
-        if not self.is_running:
+    def run(self):
+        """Main detection loop for the person detector thread."""
+        if self.model is None:
+            self.logger.error("Model not initialized, exiting run loop")
             return
-            
-        # Signal thread to stop
-        self.stop_event.set()
-        self.is_running = False
         
-        # Wait for thread to finish
-        if self.detection_thread and self.detection_thread.is_alive():
-            self.detection_thread.join(timeout=5.0)
-            
-        self.logger.info("Person detection stopped")
-    
-    def _detection_loop(self):
-        """Main detection loop running in separate thread."""
+        self.is_running = True
         self.logger.info("Person detection loop started")
         
         while not self.stop_event.is_set():
@@ -178,6 +147,7 @@ class PersonDetector:
                 self.logger.error(f"Error in detection loop: {e}")
                 time.sleep(0.1)  # Brief pause before retrying
                 
+        self.is_running = False
         self.logger.info("Person detection loop ended")
     
     def _process_frame(self, frame_data: FrameData) -> Optional[DetectionResult]:

@@ -1,0 +1,31 @@
+2025-07-13 18:50:11,357 - __main__ - INFO - Loading configuration from: config/system_config.json
+2025-07-13 18:50:11,357 - __main__ - ERROR - Configuration file not found: [Errno 2] No such file or directory: 'config/system_config.json'
+2025-07-13 18:50:26,718 - __main__ - INFO - Loading configuration from: config/system_config.json
+2025-07-13 18:50:26,718 - __main__ - ERROR - Configuration file not found: [Errno 2] No such file or directory: 'config/system_config.json'
+2025-07-13 20:08:54,466 - __main__ - INFO - Loading configuration from: config/system_config.json
+2025-07-13 20:08:54,466 - __main__ - ERROR - Configuration file not found: [Errno 2] No such file or directory: 'config/system_config.json'
+2025-07-13 20:12:53,631 - __main__ - INFO - Loading configuration from: config/system_config.json
+2025-07-13 20:12:53,641 - __main__ - ERROR - Configuration file not found: [Errno 2] No such file or directory: 'config/system_config.json'
+2025-07-13 20:14:38,393 - __main__ - INFO - Loading configuration from: config/system_config.json
+2025-07-13 20:14:38,393 - __main__ - ERROR - Configuration file not found: [Errno 2] No such file or directory: 'config/system_config.json'
+2025-07-13 20:17:40,988 - __main__ - INFO - Loading configuration from: config/system_config.json
+2025-07-13 20:17:40,988 - __main__ - ERROR - Configuration file not found: [Errno 2] No such file or directory: 'config/system_config.json'
+2025-07-13 20:20:30,886 - __main__ - INFO - Loading configuration from: c:\Users\larau\Documents\Coding\EDGE OS\camera_detection_system\config\system_config.json
+2025-07-13 20:20:30,887 - __main__ - INFO - Creating EdgeAgent...
+2025-07-13 20:20:30,888 - __main__ - INFO - Starting EdgeAgent system...
+2025-07-13 20:20:30,888 - components.edge_agent - INFO - Starting EdgeAgent system...
+2025-07-13 20:20:30,888 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 20:20:30,888 - components.person_detector - INFO - Loading YOLO model: yolov8n.pt
+2025-07-13 20:20:36,185 - components.person_detector - INFO - YOLO model loaded and warmed up successfully
+2025-07-13 20:20:36,187 - components.coordinate_calculator - INFO - CoordinateCalculator initialized: 640x480, FOV: 60.0°x45.0°
+2025-07-13 20:20:36,187 - components.edge_agent - INFO - All components initialized successfully
+2025-07-13 20:20:36,187 - components.edge_agent - INFO - Starting component threads...
+2025-07-13 20:20:36,189 - components.person_detector - INFO - Person detection loop started
+2025-07-13 20:20:36,189 - components.coordinate_processor - INFO - Coordinate processing loop started
+2025-07-13 20:20:36,189 - components.telemetry_client - INFO - Telemetry transmission loop started
+2025-07-13 20:20:36,189 - components.edge_agent - INFO - Started 4 component threads
+2025-07-13 20:20:36,217 - components.edge_agent - INFO - EdgeAgent system started successfully
+2025-07-13 20:20:36,239 - components.edge_agent - INFO - EdgeAgent running. Press Ctrl+C to stop.
+2025-07-13 20:20:36,327 - components.camera_manager - ERROR - Failed to open USB camera 0
+2025-07-13 20:20:36,356 - components.camera_manager - ERROR - Failed to initialize camera, exiting run loop
+2025-07-13 20:21:01,574 - components.edge_agent - INFO - Stats - FPS: 0.00, Frames: 0, Detections: 0, Messages: 0

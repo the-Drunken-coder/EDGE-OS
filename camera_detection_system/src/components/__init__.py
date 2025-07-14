@@ -2,14 +2,18 @@
 Components package for camera detection system
 """
 
+from .camera_manager import CameraManager
+from .person_detector import PersonDetector
 from .coordinate_calculator import CoordinateCalculator
-from .camera_manager import CameraManager, FrameData
-from .person_detector import PersonDetector, DetectionResult
+from .coordinate_processor import CoordinateProcessor
+from .telemetry_client import TelemetryClient
+from .edge_agent import EdgeAgent
 
 __all__ = [
-    'CoordinateCalculator',
     'CameraManager',
-    'FrameData', 
-    'PersonDetector',
-    'DetectionResult'
+    'PersonDetector', 
+    'CoordinateCalculator',
+    'CoordinateProcessor',
+    'TelemetryClient',
+    'EdgeAgent'
 ] 

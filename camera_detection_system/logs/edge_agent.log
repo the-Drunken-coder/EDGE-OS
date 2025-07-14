@@ -1,0 +1,125 @@
+2025-07-13 18:45:26,830 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 18:45:26,830 - components.edge_agent - INFO - All components initialized successfully
+2025-07-13 18:45:26,852 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 18:45:26,852 - components.edge_agent - ERROR - Failed to initialize components: Camera error
+2025-07-13 18:45:26,857 - components.edge_agent - INFO - Starting EdgeAgent system...
+2025-07-13 18:45:26,858 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 18:45:26,858 - components.edge_agent - INFO - All components initialized successfully
+2025-07-13 18:45:26,859 - components.edge_agent - INFO - Starting component threads...
+2025-07-13 18:45:26,860 - components.edge_agent - INFO - Started 4 component threads
+2025-07-13 18:45:26,861 - components.edge_agent - INFO - EdgeAgent system started successfully
+2025-07-13 18:45:26,861 - components.edge_agent - WARNING - EdgeAgent is already running
+2025-07-13 18:45:26,861 - components.edge_agent - INFO - Stopping EdgeAgent system...
+2025-07-13 18:45:26,861 - components.edge_agent - INFO - Final Statistics:
+2025-07-13 18:45:26,861 - components.edge_agent - INFO -   Uptime: 0.0 seconds
+2025-07-13 18:45:26,861 - components.edge_agent - INFO -   Frames processed: 0
+2025-07-13 18:45:26,861 - components.edge_agent - INFO -   Detections made: 0
+2025-07-13 18:45:26,862 - components.edge_agent - INFO -   Coordinates calculated: 0
+2025-07-13 18:45:26,862 - components.edge_agent - INFO -   Messages sent: 0
+2025-07-13 18:45:26,862 - components.edge_agent - INFO -   Errors encountered: 0
+2025-07-13 18:45:26,862 - components.edge_agent - INFO -   Average FPS: 0.00
+2025-07-13 18:45:26,862 - components.edge_agent - INFO - EdgeAgent system stopped
+2025-07-13 18:45:26,868 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 18:45:26,868 - components.edge_agent - INFO - All components initialized successfully
+2025-07-13 18:45:26,868 - components.edge_agent - INFO - Starting component threads...
+2025-07-13 18:45:26,870 - components.edge_agent - INFO - Started 4 component threads
+2025-07-13 18:45:26,876 - components.edge_agent - INFO - Starting EdgeAgent system...
+2025-07-13 18:45:26,876 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 18:45:26,876 - components.edge_agent - INFO - All components initialized successfully
+2025-07-13 18:45:26,876 - components.edge_agent - INFO - Starting component threads...
+2025-07-13 18:45:26,878 - components.edge_agent - INFO - Started 4 component threads
+2025-07-13 18:45:26,878 - components.edge_agent - INFO - EdgeAgent system started successfully
+2025-07-13 18:45:28,879 - components.edge_agent - INFO - Stopping EdgeAgent system...
+2025-07-13 18:45:28,879 - components.edge_agent - INFO - Final Statistics:
+2025-07-13 18:45:28,879 - components.edge_agent - INFO -   Uptime: 2.0 seconds
+2025-07-13 18:45:28,879 - components.edge_agent - INFO -   Frames processed: 1
+2025-07-13 18:45:28,879 - components.edge_agent - INFO -   Detections made: 1
+2025-07-13 18:45:28,879 - components.edge_agent - INFO -   Coordinates calculated: 1
+2025-07-13 18:45:28,879 - components.edge_agent - INFO -   Messages sent: 1
+2025-07-13 18:45:28,879 - components.edge_agent - INFO -   Errors encountered: 0
+2025-07-13 18:45:28,879 - components.edge_agent - INFO -   Average FPS: 0.50
+2025-07-13 18:45:28,879 - components.edge_agent - INFO - EdgeAgent system stopped
+2025-07-13 18:46:34,116 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 18:46:34,116 - components.edge_agent - INFO - All components initialized successfully
+2025-07-13 18:46:34,121 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 18:46:34,122 - components.edge_agent - ERROR - Failed to initialize components: Camera error
+2025-07-13 18:46:34,127 - components.edge_agent - INFO - Starting EdgeAgent system...
+2025-07-13 18:46:34,127 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 18:46:34,128 - components.edge_agent - INFO - All components initialized successfully
+2025-07-13 18:46:34,128 - components.edge_agent - INFO - Starting component threads...
+2025-07-13 18:46:34,130 - components.edge_agent - INFO - Started 4 component threads
+2025-07-13 18:46:34,130 - components.edge_agent - INFO - EdgeAgent system started successfully
+2025-07-13 18:46:34,131 - components.edge_agent - WARNING - EdgeAgent is already running
+2025-07-13 18:46:34,131 - components.edge_agent - INFO - Stopping EdgeAgent system...
+2025-07-13 18:46:34,131 - components.edge_agent - INFO - Final Statistics:
+2025-07-13 18:46:34,131 - components.edge_agent - INFO -   Uptime: 0.0 seconds
+2025-07-13 18:46:34,131 - components.edge_agent - INFO -   Frames processed: 0
+2025-07-13 18:46:34,132 - components.edge_agent - INFO -   Detections made: 0
+2025-07-13 18:46:34,132 - components.edge_agent - INFO -   Coordinates calculated: 0
+2025-07-13 18:46:34,132 - components.edge_agent - INFO -   Messages sent: 0
+2025-07-13 18:46:34,132 - components.edge_agent - INFO -   Errors encountered: 0
+2025-07-13 18:46:34,132 - components.edge_agent - INFO -   Average FPS: 0.00
+2025-07-13 18:46:34,132 - components.edge_agent - INFO - EdgeAgent system stopped
+2025-07-13 18:46:34,136 - components.edge_agent - INFO - Stopping EdgeAgent system...
+2025-07-13 18:46:34,136 - components.edge_agent - INFO - Final Statistics:
+2025-07-13 18:46:34,136 - components.edge_agent - INFO -   Uptime: 10.0 seconds
+2025-07-13 18:46:34,136 - components.edge_agent - INFO -   Frames processed: 100
+2025-07-13 18:46:34,136 - components.edge_agent - INFO -   Detections made: 0
+2025-07-13 18:46:34,136 - components.edge_agent - INFO -   Coordinates calculated: 0
+2025-07-13 18:46:34,137 - components.edge_agent - INFO -   Messages sent: 0
+2025-07-13 18:46:34,137 - components.edge_agent - INFO -   Errors encountered: 0
+2025-07-13 18:46:34,137 - components.edge_agent - INFO -   Average FPS: 10.00
+2025-07-13 18:46:34,137 - components.edge_agent - INFO - EdgeAgent system stopped
+2025-07-13 18:46:34,140 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 18:46:34,140 - components.edge_agent - INFO - All components initialized successfully
+2025-07-13 18:46:34,140 - components.edge_agent - INFO - Starting component threads...
+2025-07-13 18:46:34,142 - components.edge_agent - INFO - Started 4 component threads
+2025-07-13 18:46:34,343 - components.edge_agent - WARNING - EdgeAgent is not running
+2025-07-13 18:46:38,361 - components.edge_agent - INFO - Starting EdgeAgent system...
+2025-07-13 18:46:38,361 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 18:46:38,361 - components.edge_agent - INFO - All components initialized successfully
+2025-07-13 18:46:38,361 - components.edge_agent - INFO - Starting component threads...
+2025-07-13 18:46:38,361 - components.edge_agent - INFO - Started 4 component threads
+2025-07-13 18:46:38,361 - components.edge_agent - INFO - EdgeAgent system started successfully
+2025-07-13 18:46:40,369 - components.edge_agent - INFO - Stopping EdgeAgent system...
+2025-07-13 18:46:40,370 - components.edge_agent - INFO - Final Statistics:
+2025-07-13 18:46:40,370 - components.edge_agent - INFO -   Uptime: 2.0 seconds
+2025-07-13 18:46:40,370 - components.edge_agent - INFO -   Frames processed: 1
+2025-07-13 18:46:40,370 - components.edge_agent - INFO -   Detections made: 1
+2025-07-13 18:46:40,371 - components.edge_agent - INFO -   Coordinates calculated: 1
+2025-07-13 18:46:40,371 - components.edge_agent - INFO -   Messages sent: 1
+2025-07-13 18:46:40,371 - components.edge_agent - INFO -   Errors encountered: 0
+2025-07-13 18:46:40,371 - components.edge_agent - INFO -   Average FPS: 0.50
+2025-07-13 18:46:40,371 - components.edge_agent - INFO - EdgeAgent system stopped
+2025-07-13 18:47:43,472 - components.edge_agent - INFO - Starting EdgeAgent system...
+2025-07-13 18:47:43,473 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 18:47:43,473 - components.edge_agent - INFO - All components initialized successfully
+2025-07-13 18:47:43,473 - components.edge_agent - INFO - Starting component threads...
+2025-07-13 18:47:43,475 - components.edge_agent - INFO - Started 4 component threads
+2025-07-13 18:47:43,475 - components.edge_agent - INFO - EdgeAgent system started successfully
+2025-07-13 18:47:44,977 - components.edge_agent - INFO - Stopping EdgeAgent system...
+2025-07-13 18:47:44,978 - components.edge_agent - INFO - Final Statistics:
+2025-07-13 18:47:44,978 - components.edge_agent - INFO -   Uptime: 1.5 seconds
+2025-07-13 18:47:44,978 - components.edge_agent - INFO -   Frames processed: 10
+2025-07-13 18:47:44,978 - components.edge_agent - INFO -   Detections made: 8
+2025-07-13 18:47:44,978 - components.edge_agent - INFO -   Coordinates calculated: 8
+2025-07-13 18:47:44,978 - components.edge_agent - INFO -   Messages sent: 5
+2025-07-13 18:47:44,978 - components.edge_agent - INFO -   Errors encountered: 0
+2025-07-13 18:47:44,979 - components.edge_agent - INFO -   Average FPS: 6.65
+2025-07-13 18:47:44,979 - components.edge_agent - INFO - EdgeAgent system stopped
+2025-07-13 18:48:18,911 - components.edge_agent - INFO - Starting EdgeAgent system...
+2025-07-13 18:48:18,911 - components.edge_agent - INFO - Initializing EdgeAgent components...
+2025-07-13 18:48:18,911 - components.edge_agent - INFO - All components initialized successfully
+2025-07-13 18:48:18,911 - components.edge_agent - INFO - Starting component threads...
+2025-07-13 18:48:18,917 - components.edge_agent - INFO - Started 4 component threads
+2025-07-13 18:48:18,917 - components.edge_agent - INFO - EdgeAgent system started successfully
+2025-07-13 18:48:20,418 - components.edge_agent - INFO - Stopping EdgeAgent system...
+2025-07-13 18:48:20,418 - components.edge_agent - INFO - Final Statistics:
+2025-07-13 18:48:20,418 - components.edge_agent - INFO -   Uptime: 1.5 seconds
+2025-07-13 18:48:20,418 - components.edge_agent - INFO -   Frames processed: 10
+2025-07-13 18:48:20,418 - components.edge_agent - INFO -   Detections made: 8
+2025-07-13 18:48:20,419 - components.edge_agent - INFO -   Coordinates calculated: 8
+2025-07-13 18:48:20,419 - components.edge_agent - INFO -   Messages sent: 5
+2025-07-13 18:48:20,419 - components.edge_agent - INFO -   Errors encountered: 0
+2025-07-13 18:48:20,420 - components.edge_agent - INFO -   Average FPS: 6.64
+2025-07-13 18:48:20,420 - components.edge_agent - INFO - EdgeAgent system stopped

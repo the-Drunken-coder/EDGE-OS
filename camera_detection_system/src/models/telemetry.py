@@ -47,18 +47,20 @@ class SpatialCoordinates:
 @dataclass
 class Detection:
     """Individual person detection with spatial and visual information."""
-    type: str                    # "person", "vehicle", etc.
+    object_id: str               # Unique identifier for this detection
+    object_type: str             # "person", "vehicle", etc.
     confidence: float            # 0.0 to 1.0
-    spatial: SpatialCoordinates
     bounding_box: BoundingBox
+    spatial_coordinates: Optional[SpatialCoordinates] = None
     track_id: Optional[str] = None
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            "type": self.type,
+            "object_id": self.object_id,
+            "object_type": self.object_type,
             "confidence": self.confidence,
-            "spatial": self.spatial.to_dict(),
             "bounding_box": self.bounding_box.to_dict(),
+            "spatial_coordinates": self.spatial_coordinates.to_dict() if self.spatial_coordinates else None,
             "track_id": self.track_id
         }
 
@@ -112,10 +114,11 @@ class TelemetryMessage:
             system_status=SystemStatus(**data['system_status']),
             detections=[
                 Detection(
-                    type=det['type'],
+                    object_id=det['object_id'],
+                    object_type=det['object_type'],
                     confidence=det['confidence'],
-                    spatial=SpatialCoordinates(**det['spatial']),
                     bounding_box=BoundingBox(**det['bounding_box']),
+                    spatial_coordinates=SpatialCoordinates(**det['spatial_coordinates']) if det['spatial_coordinates'] else None,
                     track_id=det.get('track_id')
                 )
                 for det in data['detections']
